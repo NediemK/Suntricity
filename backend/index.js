@@ -1,5 +1,6 @@
 var express = require('express');
 const userRoute = require('./routes/userRoute');
+const panelRoute = require('./routes/panelRoute')
 var app = express();
 var connection = require('./configuration/connectDB');
 const cors = require('cors');
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', userRoute);
+app.use("/api", panelRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

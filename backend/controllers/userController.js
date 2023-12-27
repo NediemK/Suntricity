@@ -1,6 +1,9 @@
 
 
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+require('dotenv').config();
+
 //get all users
 const getUsers = async (requset, response) => {
   try {
@@ -80,39 +83,31 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt'); // for password hashing
-
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+const signIn = async (req, res) => {
+  const user = req.body;
+  try {
+    const foundUser = await User.findOne({
+      where: { email: user.email },
+    });
   
-    try {
-      // Find the user by username
-      const user = await User.findOne({ where: { email: email } });
-  
-      // If the user is not found, return an error
-      if (!user) {
-        return res.status(404).json({ msg: 'User not found' });
-      }
-  
-      // Compare the provided password with the stored hashed password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-  
-      // If the password is not valid, return an error
-      if (!isPasswordValid) {
-        return res.status(401).json({ msg: 'Invalid credentials' });
-      }
-  
-      // Placeholder for handling successful login
-      // You may want to generate a token or set up a session here
-      // For now, returning a success message as an example
-      return res.status(200).json({ msg: 'Login successful' });
-    } catch (error) {
-      console.error('Error on login:', error);
-      return res.status(500).json({ msg: 'Error on login', error: error.message });
-    }
+  if (foundUser) {
+  if (user.password === foundUser.password) {
+  const token = jwt.sign(
+  { id: foundUser._id, role: foundUser.role },
+  process.env.JWT_SECRET
+  );
+  res.status(200).json({ user: foundUser, token: token });
+  } else {
+  res.status(400).json({ msg: "Wrong password" });
+  }
+  } else {
+  return res.status(400).json({ msg: "User not registered" });
+  }
+  } catch (error) {
+  console.error(error);
+  res.status(500).json({ msg: "Server error" });
+  }
   };
-
-module.exports = { getUsers, getOneUser, postUser, putUser, deleteUser, loginUser };
+module.exports = { getUsers, getOneUser, postUser, putUser, deleteUser, signIn };
 
   

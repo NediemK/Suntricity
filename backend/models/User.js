@@ -24,6 +24,13 @@ const User = sequelize.define(
     password: {
       type: DataTypes.STRING, // Use a length that accommodates the hashed password
     },
+    role: {
+      type: DataTypes.STRING, 
+    },
+    age: {
+      type: DataTypes.INTEGER, 
+    },
+    
   },
   { timestamps: false }
 );

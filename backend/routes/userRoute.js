@@ -1,24 +1,19 @@
 const express = require("express");
 const userRoute = express.Router();
-const db = require('../models/User'); // Assuming you have a models folder with your database models
-
 const {
-  getUsers,
-  postUser,
-  putUser,
-  deleteUser,
-  getOneUser,
-  loginUser,
+getUsers,
+postUser,
+putUser,
+deleteUser,
+getOneUser,
+signIn,
 } = require("../controllers/userController");
-
-// CRUD operations for users
+const isAuth = require("../middleware/isAuth")
+const isAutho=require('../middleware/isAutho')
 userRoute.get("/users", getUsers);
-userRoute.get("/users/:id", getOneUser);
+userRoute.get("/users/:id", isAuth,isAutho(['user']), getOneUser);
 userRoute.post("/users", postUser);
 userRoute.put("/users/:id", putUser);
-userRoute.delete("/users/:id", deleteUser);
-
-// Login route - Use userRoute instead of router
-userRoute.post('/login', loginUser);
-
+userRoute.delete("/users/:id",isAuth,isAutho(['admin']), deleteUser);
+userRoute.post("/signIn", signIn);
 module.exports = userRoute;
